@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: no.hvl.dat152.rest.ws.jpa.test.OrderRepositoryTest
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.233 s - in no.hvl.dat152.rest.ws.jpa.test.OrderRepositoryTest

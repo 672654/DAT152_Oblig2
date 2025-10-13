@@ -3,9 +3,9 @@
  */
 package no.hvl.dat152.rest.ws.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
-import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,30 +21,48 @@ import no.hvl.dat152.rest.ws.repository.OrderRepository;
 @Service
 public class OrderService {
 
-	@Autowired
-	private OrderRepository orderRepository;
-	
-	public Order saveOrder(Order order) {
-		
-		order = orderRepository.save(order);
-		
-		return order;
-	}
-	
-	public Order findOrder(Long id) throws OrderNotFoundException {
-		
-		Order order = orderRepository.findById(id)
-				.orElseThrow(()-> new OrderNotFoundException("Order with id: "+id+" not found in the order list!"));
-		
-		return order;
-	}
-	
-	// TODO public void deleteOrder(Long id)
-	
-	// TODO public List<Order> findAllOrders()
-	
-	// TODO public List<Order> findByExpiryDate(LocalDate expiry, Pageable page)
-	
-	// TODO public Order updateOrder(Order order, Long id)
+  @Autowired
+  private OrderRepository orderRepository;
 
+  public Order saveOrder(Order order) {
+
+    order = orderRepository.save(order);
+
+    return order;
+  }
+
+  public Order findOrder(Long id) throws OrderNotFoundException {
+
+    Order order = orderRepository.findById(id)
+        .orElseThrow(() -> new OrderNotFoundException("Order with id: " + id + " not found in the order list!"));
+
+    return order;
+  }
+
+  // TODO public void deleteOrder(Long id)
+  public void deleteOrder(Long id) throws OrderNotFoundException {
+    Order order = findOrder(id);
+    orderRepository.delete(order);
+  }
+
+  // TODO public List<Order> findAllOrders()
+  public List<Order> findAllOrders(Pageable pageable) {
+    return orderRepository.findAll(pageable).getContent();
+  }
+
+  // TODO public List<Order> findByExpiryDate(LocalDate expiry, Pageable page)
+  public List<Order> findByExpiryDate(LocalDate expiry, Pageable page) {
+
+    Page<Order> orders = orderRepository.findByExpiryBefore(expiry, page);
+    return orders.getContent();
+  }
+
+  // TODO public Order updateOrder(Order order, Long id)
+  public Order updateOrder(Order order, Long id) throws OrderNotFoundException {
+    Order existingOrder = findOrder(id);
+    existingOrder.setIsbn(order.getIsbn());
+    existingOrder.setExpiry(order.getExpiry());
+    return orderRepository.save(existingOrder);
+
+  }
 }
