@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +40,7 @@ public class UserController {
   private UserService userService;
 
   @GetMapping("/users")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Object> getUsers() {
 
     List<User> users = userService.findAllUsers();
@@ -51,6 +53,7 @@ public class UserController {
   }
 
   @GetMapping(value = "/users/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Object> getUser(@PathVariable Long id) throws UserNotFoundException, OrderNotFoundException {
 
     User user = userService.findUser(id);

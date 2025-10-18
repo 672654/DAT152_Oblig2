@@ -15,6 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,6 +42,7 @@ public class OrderController {
   // TODO - getAllBorrowOrders (@Mappings, URI=/orders, and method) + filter by
   // expiry and paginate
   @GetMapping("/orders")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<List<Order>> getAllBorrowOrders(
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate expiry,
       Pageable pageable) throws OrderNotFoundException {
@@ -64,6 +66,7 @@ public class OrderController {
 
   // TODO - getBorrowOrder (@Mappings, URI=/orders/{id}, and method)
   @GetMapping("orders/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Order> getBorrowOrder(@PathVariable Long id) throws OrderNotFoundException {
     Order order = orderService.findOrder(id);
     Link link = linkTo(methodOn(OrderController.class).getBorrowOrder(id)).withSelfRel();
@@ -73,6 +76,7 @@ public class OrderController {
 
   // TODO - updateOrder (@Mappings, URI=/orders/{id}, and method)
   @PutMapping("orders/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody Order order)
       throws OrderNotFoundException {
     Order updatedOrder = orderService.updateOrder(order, id);
@@ -81,6 +85,7 @@ public class OrderController {
 
   // TODO - deleteBookOrder (@Mappings, URI=/orders/{id}, and method)
   @DeleteMapping("/orders/{id}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Object> deleteOrder(@PathVariable Long id) throws OrderNotFoundException {
     orderService.deleteOrder(id);
     return new ResponseEntity<>(HttpStatus.OK);

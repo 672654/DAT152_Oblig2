@@ -9,6 +9,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +36,7 @@ public class BookController {
   private BookService bookService;
 
   @GetMapping("/books")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Object> getAllBooks() {
 
     List<Book> books = bookService.findAll();
@@ -46,6 +48,7 @@ public class BookController {
   }
 
   @GetMapping("/books/{isbn}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Object> getBook(@PathVariable String isbn) throws BookNotFoundException {
 
     Book book = bookService.findByISBN(isbn);
@@ -55,6 +58,7 @@ public class BookController {
   }
 
   @PostMapping("/books")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Book> createBook(@RequestBody Book book) {
 
     Book nbook = bookService.saveBook(book);
@@ -64,6 +68,7 @@ public class BookController {
 
   // TODO - getAuthorsOfBookByISBN (@Mappings, URI, and method)
   @GetMapping("/books/{isbn}/authors")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Set<Author>> getAuthorsOfBookByISBN(@PathVariable String isbn) throws BookNotFoundException {
     Set<Author> authors = bookService.findAuthorsOfBookByISBN(isbn);
     return new ResponseEntity<>(authors, HttpStatus.OK);
@@ -71,6 +76,7 @@ public class BookController {
 
   // TODO - updateBookByISBN (@Mappings, URI, and method)
   @PutMapping(value = "/books/{isbn}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Book> updateBook(@PathVariable String isbn, @RequestBody Book book)
       throws BookNotFoundException, UpdateBookFailedException {
     Book updatedBook = bookService.updateBook(book, isbn);
@@ -79,6 +85,7 @@ public class BookController {
 
   // TODO - deleteBookByISBN (@Mappings, URI, and method)
   @DeleteMapping(value = "books/{isbn}")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<Void> deleteBook(@PathVariable String isbn) throws BookNotFoundException {
     bookService.deleteByISBN(isbn);
     return new ResponseEntity<>(HttpStatus.OK);
