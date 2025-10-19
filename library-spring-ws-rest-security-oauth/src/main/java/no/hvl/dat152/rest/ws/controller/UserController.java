@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,7 +54,7 @@ public class UserController {
   }
 
   @GetMapping(value = "/users/{id}")
-  @PreAuthorize("hasRole('ADMIN')")
+  @PostAuthorize("hasRole('ADMIN') or returnObject.body.email == authentication.token.claims['email']")
   public ResponseEntity<Object> getUser(@PathVariable Long id) throws UserNotFoundException, OrderNotFoundException {
 
     User user = userService.findUser(id);
@@ -64,6 +65,7 @@ public class UserController {
 
   // TODO - createUser (@Mappings, URI=/users, and method)
   @PostMapping("/users")
+  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<User> createUser(@RequestBody User user) {
     User createdUser = userService.saveUser(user);
     return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
@@ -71,6 +73,7 @@ public class UserController {
 
   // TODO - updateUser (@Mappings, URI, and method)
   @PutMapping(value = "users/{id}")
+  @PostAuthorize("hasRole('ADMIN') or returnObject.body.email == authentication.token.claims['email']")
   public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user) throws UserNotFoundException {
 
     User updatedUser = userService.updateUser(user, id);
@@ -79,6 +82,7 @@ public class UserController {
 
   // TODO - deleteUser (@Mappings, URI, and method)
   @DeleteMapping(value = "users/{id}")
+  @PreAuthorize("hasRole('ADMIN') or @userService.findUser(#id).email == authentication.token.claims['email']")
   public ResponseEntity<Void> deleteUser(@PathVariable Long id) throws UserNotFoundException {
     userService.deleteUser(id);
     return new ResponseEntity<>(HttpStatus.OK);
@@ -86,6 +90,7 @@ public class UserController {
 
   // TODO - getUserOrders (@Mappings, URI=/users/{id}/orders, and method)
   @GetMapping("users/{userid}/orders")
+  @PreAuthorize("hasRole('ADMIN') or @userService.findUser(#userid).email == authentication.token.claims['email']")
   public ResponseEntity<Set<Order>> getUserOrders(@PathVariable Long userid) throws UserNotFoundException {
 
     Set<Order> orders = userService.getUserOrders(userid);
@@ -94,6 +99,7 @@ public class UserController {
 
   // TODO - getUserOrder (@Mappings, URI=/users/{uid}/orders/{oid}, and method)
   @GetMapping(value = "/users/{userid}/orders/{oid}")
+  @PreAuthorize("hasRole('ADMIN') or @userService.findUser(#userid).email == authentication.token.claims['email']")
   public ResponseEntity<Order> getUserOrder(@PathVariable Long userid, @PathVariable Long oid)
       throws UserNotFoundException {
 
@@ -103,6 +109,7 @@ public class UserController {
 
   // TODO - deleteUserOrder (@Mappings, URI, and method)
   @DeleteMapping("users/{userid}/orders/{orderid}")
+  @PreAuthorize("hasRole('ADMIN') or @userService.findUser(#userid).email == authentication.token.claims['email']")
   public ResponseEntity<Void> deleteUserOrder(@PathVariable Long userid, @PathVariable Long orderid)
       throws UserNotFoundException {
 
@@ -112,6 +119,7 @@ public class UserController {
 
   // TODO - createUserOrder (@Mappings, URI, and method) + HATEOAS links
   @PostMapping("users/{userid}/orders")
+  @PreAuthorize("hasRole('ADMIN') or @userService.findUser(#userid).email == authentication.token.claims['email']")
   public ResponseEntity<Set<Order>> createUserOrder(@RequestBody Order order, @PathVariable Long userid)
       throws UserNotFoundException, OrderNotFoundException {
 

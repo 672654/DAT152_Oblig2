@@ -35,7 +35,7 @@ public class AuthorController {
 
   // TODO - getAllAuthor (@Mappings, URI, and method)
   @GetMapping("authors")
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   public ResponseEntity<List<Author>> getAllAuthors() {
     List<Author> authors = authorService.findAll();
     return new ResponseEntity<>(authors, HttpStatus.OK);
