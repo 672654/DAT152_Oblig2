@@ -7,6 +7,7 @@ import java.time.LocalDate;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -16,11 +17,16 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import no.hvl.dat152.rest.ws.exceptions.OrderNotFoundException;
 import no.hvl.dat152.rest.ws.exceptions.UnauthorizedOrderActionException;
+import no.hvl.dat152.rest.ws.model.Order;
+import no.hvl.dat152.rest.ws.service.OrderService;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class TestOrder {
 
+	@Autowired
+	private OrderService orderService;
+	
 	private String API_ROOT = "http://localhost:8090/elibrary/api/v1";
 	
 	@Value("${admin.token.test}") 
@@ -75,12 +81,15 @@ class TestOrder {
 	@Test
 	public void getOrderById_thenOK() throws OrderNotFoundException, UnauthorizedOrderActionException {
 		
+		Order order = orderService.findOrder(1L);
+		System.out.println(order.getIsbn());
+		
 	    Response response = RestAssured.given()
 				.header("Authorization", "Bearer "+ ADMIN_TOKEN)
-	    		.get(API_ROOT+"/orders/{id}", 2);
+	    		.get(API_ROOT+"/orders/{id}",order.getId());
 	    
 	    assertEquals(HttpStatus.OK.value(), response.getStatusCode());
-	    assertEquals("ghijk1234", response.jsonPath().get("isbn"));
+	    assertEquals(order.getIsbn(), response.jsonPath().get("isbn"));
 	}
 	
 	@DisplayName("JUnit test for @PutMapping(/orders/{id}) endpoint")
@@ -95,7 +104,7 @@ class TestOrder {
 				.header("Authorization", "Bearer "+ ADMIN_TOKEN)
 				.contentType(MediaType.APPLICATION_JSON_VALUE)
 				.body(uorder)
-				.put(API_ROOT+"/orders/{id}", 2);
+				.put(API_ROOT+"/orders/{id}", 1);
 	    
 	    assertEquals(HttpStatus.OK.value(), response.getStatusCode());
 	    assertEquals(nexpiry, response.jsonPath().get("expiry"));
@@ -107,7 +116,7 @@ class TestOrder {
 
 	    Response response = RestAssured.given()
 				.header("Authorization", "Bearer "+ ADMIN_TOKEN)
-	    		.delete(API_ROOT+"/orders/{id}", 1);
+	    		.delete(API_ROOT+"/orders/{id}", 2);
 	    
 	    assertEquals(HttpStatus.OK.value(), response.getStatusCode());
 
@@ -119,7 +128,7 @@ class TestOrder {
 
 	    Response response = RestAssured.given()
 	    		.header("Authorization", "Bearer "+ ADMIN_TOKEN)
-	    		.get(API_ROOT+"/orders/2");
+	    		.get(API_ROOT+"/orders/1");
 	    
 	    assertTrue(response.jsonPath().get("_links").toString().contains("href"));
 	}
