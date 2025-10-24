@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,6 @@ import no.hvl.dat152.rest.ws.exceptions.UnauthorizedOrderActionException;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 class TestOrder {
-
 
 	private String API_ROOT = "http://localhost:8090/elibrary/api/v1";
 	
